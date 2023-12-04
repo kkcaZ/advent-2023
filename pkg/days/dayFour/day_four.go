@@ -81,6 +81,80 @@ func (d service) PartOne() error {
 }
 
 func (d service) PartTwo() error {
+	cards, err := getCards()
+	if err != nil {
+		return err
+	}
+
+	counts := make(map[string]int)
+	for _, card := range cards {
+		if card == "" {
+			continue
+		}
+		counts[card] = 1
+	}
+
+	for cardIndex, card := range cards {
+		if card == "" {
+			continue
+		}
+
+		definition := strings.Split(card, ":")
+		cardSplit := strings.Split(definition[1], "|")
+		cardSplit[0] = strings.TrimLeft(cardSplit[0], " ")
+		cardSplit[0] = strings.TrimRight(cardSplit[0], " ")
+		cardSplit[1] = strings.TrimLeft(cardSplit[1], " ")
+		cardSplit[1] = strings.TrimRight(cardSplit[1], " ")
+
+		strWinningNumbers := strings.Split(cardSplit[0], " ")
+		winningNumbers := make([]int, 0)
+		for _, num := range strWinningNumbers {
+			if num == "" {
+				continue
+			}
+
+			n, err := strconv.Atoi(num)
+			if err != nil {
+				return err
+			}
+
+			winningNumbers = append(winningNumbers, n)
+		}
+
+		strGivenNumbers := strings.Split(cardSplit[1], " ")
+		foundNumbers := 0
+		for _, num := range strGivenNumbers {
+			if num == "" {
+				continue
+			}
+
+			n, err := strconv.Atoi(num)
+			if err != nil {
+				return err
+			}
+
+			for _, winningNum := range winningNumbers {
+				if n == winningNum {
+					foundNumbers++
+				}
+			}
+		}
+
+		for i := 1; i <= foundNumbers; i++ {
+			if cardIndex+i >= len(cards) {
+				continue
+			}
+
+			counts[cards[cardIndex+i]] += counts[card]
+		}
+	}
+
+	total := 0
+	for _, count := range counts {
+		total += count
+	}
+
+	fmt.Println(total)
 
 	return nil
 }
